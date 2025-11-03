@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EventGo — Home</title>
+
+  <!-- Google font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="pill">Event<span>Go</span></div>
+        <div class="address">
+          <div class="addr-line">No 27, Kulakarai Street...</div>
+          <div class="city">Bengaluru</div>
+        </div>
+      </div>
+
+      <nav class="top-nav">
+        <a href="#">Near you</a>
+        <a href="#">For you</a>
+        <a href="#">All Events</a>
+        <div class="search">
+          <input type="text" placeholder="Search for music shows, festivals etc">
+        </div>
+        <button id="loginBtn" class="avatar-btn" title="Login">👤</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <!-- Slide 1 -->
+      <div class="slide slide-1">
+        <div class="content">
+          <div class="meta">Sat, Oct 1, 10 PM • Leela Palace, Bengaluru</div>
+          <h1><span class="highlight">AR Rahman</span> Live in Concert!!</h1>
+          <p class="subtitle">Experience a legendary night of soulful music and lights.</p>
+          <button class="btn">Book Tickets</button>
+        </div>
+        <div class="image" style="background-image: url('AR\ rahmena.jpg');" aria-hidden="true"></div>
+      </div>
+  
+      <!-- Slide 2 -->
+      <div class="slide slide-2">
+        <div class="content">
+          <div class="meta">Fri, Nov 14, 8 PM • Jawaharlal Nehru Stadium</div>
+          <h1><span class="highlight">Sid Sriram</span> Unplugged Night</h1>
+          <p class="subtitle">An intimate evening of soulful melodies and acoustic magic.</p>
+          <button class="btn">Book Tickets</button>
+        </div>
+        <div class="image" style="background-image: url('sid.jpg');" aria-hidden="true"></div>
+      </div>
+  
+      <!-- Slide 3 -->
+      <div class="slide slide-3">
+        <div class="content">
+          <div class="meta">Sun, Dec 7, 7 PM • Palace Grounds</div>
+          <h1><span class="highlight">Shreya Ghoshal</span> — Evening Symphony</h1>
+          <p class="subtitle">A melodious night featuring blockbuster hits and classical gems.</p>
+          <button class="btn">Book Tickets</button>
+        </div>
+        <div class="image" style="background-image: url('shreya.jpg');" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+  
+  
+  
+  <!-- Trending Artists -->
+  <section class="section">
+    <h2 class="section-title">Trending Artists in your locality</h2>
+    <div class="artists">
+      <div class="artist"><img src="harish.jpg" alt=""><div class="name">Harris Jayaraj</div></div>
+      <div class="artist"><img src="sid.jpg" alt=""><div class="name">Sid Sriram</div></div>
+      <div class="artist"><img src="priya.jpg" alt=""><div class="name">Priya Jerson</div></div>
+      <div class="artist"><img src="swetamohan.jpg" alt=""><div class="name">Shweta Mohan</div></div>
+      <div class="artist"><img src="rajkumar.jpg" alt=""><div class="name">Ramkumar Comic</div></div>
+      <div class="artist"><img src="yuvanraja.jpg" alt=""><div class="name">Yuvan Raja</div></div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section">
+    <h2 class="section-title">Explore Categories</h2>
+    <div class="categories">
+      <div class="cat purple"><div>Music</div><span>20+ Events</span></div>
+      <div class="cat pink"><div>Festivals</div><span>10+ Events</span></div>
+      <div class="cat mint"><div>Comedy</div><span>15+ Events</span></div>
+      <div class="cat orange"><div>Kids</div><span>8+ Events</span></div>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section class="section">
+    <h2 class="section-title">Events near you</h2>
+    <div class="events-grid">
+      <article class="event-card">
+        <div class="event-poster" style="background-image:url('even1.jpg')"></div>
+        <div class="event-body">
+          <h3>Concert RnB 2.0</h3>
+          <p>Sat, Oct 1, 10 AM • From ₹500 onwards</p>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-poster" style="background-image:url('event2.jpg')"></div>
+        <div class="event-body">
+          <h3>Rock On - Leela Palace</h3>
+          <p>Sat, Oct 1, 8 PM • From ₹700 onwards</p>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-poster" style="background-image:url('event4.jpg')"></div>
+        <div class="event-body">
+          <h3>Musical Express</h3>
+          <p>Sun, Oct 2, 6 PM • From ₹500 onwards</p>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-poster" style="background-image:url('event6.jpg')"></div>
+        <div class="event-body">
+          <h3>October Theatre Fest</h3>
+          <p>Sat, Oct 8, 5 PM • From ₹800 onwards</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-left"><div class="pill small">EventGo</div></div>
+    <div class="footer-right">
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact Us</a>
+      <a href="#">Help Centre</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
