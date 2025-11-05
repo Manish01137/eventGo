@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book Tickets — EventGo</title>
+
+  <!-- Font (same as main site) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Optional: keep your main site css if present -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Page-specific styles (self-contained & animated) -->
+  <style>
+    :root{
+      --purple:#7C3AED;
+      --lavender:#E5D4F9;
+      --peach:#FFD39A;
+      --bg:#faf8ff;
+      --muted:#6b6b7a;
+      --card-shadow: 0 12px 30px rgba(60,40,110,0.06);
+      --glass: rgba(255,255,255,0.6);
+      --glass-2: rgba(255,255,255,0.9);
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background: linear-gradient(180deg,#fbf9ff 0%, #fffaf0 100%);
+      color:#222;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+    }
+
+    /* Header (reuse site look) */
+    .header {
+      width:100%;
+      background:transparent;
+      padding:18px 28px;
+      position:sticky; top:0; z-index:30;
+    }
+    .header-inner{
+      max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;
+    }
+    .pill{ background:linear-gradient(135deg,var(--purple),#9E5CFF); padding:8px 12px; border-radius:10px; color:#fff; font-weight:700; box-shadow:0 8px 24px rgba(124,58,237,0.14)}
+    .pill span{ color:#FFF3B0 }
+
+    /* Main container */
+    .container {
+      width:100%;
+      max-width:1100px;
+      margin:36px auto;
+      padding:18px;
+      box-sizing:border-box;
+      flex:1 0 auto;
+    }
+
+    /* Card layout */
+    .grid {
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:start;
+    }
+    @media (max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.98));
+      border-radius:14px;
+      padding:22px;
+      box-shadow: var(--card-shadow);
+      overflow:visible;
+      position:relative;
+      transform-origin:center;
+      animation: cardEntrance .6s cubic-bezier(.2,.9,.25,1) both;
+    }
+    @keyframes cardEntrance {
+      from { transform: translateY(18px) scale(.995); opacity:0; }
+      to   { transform: translateY(0) scale(1); opacity:1; }
+    }
+
+    /* Left: form */
+    .card h1{ font-size:22px; margin-bottom:6px; color:#2b2160 }
+    .muted{ color:var(--muted); font-size:14px; margin-bottom:12px }
+    label{ display:block; font-weight:600; color:#3a2b6a; margin:10px 0 6px; font-size:13px; }
+    input[type="text"], input[type="email"], input[type="tel"], select {
+      width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(20,20,30,0.06); background:var(--glass-2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      font-size:14px; transition: box-shadow .18s ease, transform .12s ease;
+    }
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 8px 30px rgba(124,58,237,0.12);
+      transform: translateY(-2px);
+    }
+
+    .row { display:flex; gap:12px; }
+    .col { flex:1; }
+
+    /* ticket selection */
+    .ticket-grid { display:flex; gap:12px; margin-top:10px; }
+    .ticket-type {
+      flex:1; padding:12px; border-radius:10px; text-align:center; cursor:pointer;
+      background: linear-gradient(180deg,#fff,#fbfbff); border:1px solid rgba(0,0,0,0.04);
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+    .ticket-type.active { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(124,58,237,0.12); border-color: rgba(124,58,237,0.12); }
+    .ticket-type small { display:block; color:var(--muted); margin-top:6px; font-weight:600 }
+
+    /* right column: summary */
+    .summary {
+      position:sticky; top:24px; align-self:start;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .summary .panel { padding:18px; border-radius:12px; background:linear-gradient(180deg,#fff,#fbfbff); box-shadow: var(--card-shadow); }
+    .summary h3 { margin:0 0 6px 0; color:#3b2170 }
+
+    .price { font-size:22px; font-weight:800; color:#23174f; }
+    .small { font-size:13px; color:var(--muted) }
+
+    .btn-primary {
+      display:inline-flex; align-items:center; gap:10px;
+      background:linear-gradient(90deg,var(--purple),#9E5CFF);
+      color:#fff; padding:12px 16px; border-radius:10px; border:none; font-weight:800; cursor:pointer;
+      box-shadow: 0 12px 30px rgba(124,58,237,0.18);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 18px 42px rgba(124,58,237,0.26); }
+
+    /* animated progress / payment mock */
+    .loader {
+      width:48px; height:48px; border-radius:12px; display:inline-grid; place-items:center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.18));
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+      transform-origin:center;
+    }
+    .spinner {
+      width:18px; height:18px; border-radius:50%; border:3px solid rgba(255,255,255,0.25); border-top-color:#fff;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg) } }
+
+    /* subtle floating decorative hero at top of form */
+    .hero-banner {
+      display:flex; gap:14px; align-items:center; margin-bottom:16px;
+      padding:10px 14px; border-radius:12px;
+      background: linear-gradient(90deg, rgba(124,58,237,0.06), rgba(255,189,122,0.04));
+      border:1px solid rgba(124,58,237,0.06);
+      box-shadow: 0 6px 18px rgba(124,58,237,0.04);
+      animation: floatBanner 4s ease-in-out infinite;
+    }
+    @keyframes floatBanner {
+      0% { transform: translateY(0) }
+      50% { transform: translateY(-6px) }
+      100% { transform: translateY(0) }
+    }
+
+    /* success animation (confetti-like) */
+    .confetti {
+      pointer-events:none;
+      position:absolute; inset: -40px -40px auto auto; width:120px; height:120px; z-index:9;
+      opacity:0; transform: translateY(-10px) scale(.95);
+      transition: opacity .3s ease, transform .35s cubic-bezier(.2,.9,.2,1);
+    }
+    .confetti.show { opacity:1; transform: translateY(0) scale(1); }
+    .confetti svg { width:100%; height:100%; display:block; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.08)); }
+
+    /* helper */
+    .muted-note{ font-size:13px; color:var(--muted); margin-top:10px }
+
+    /* errors */
+    .error { color:#B00020; font-size:13px; margin-top:6px; display:none }
+
+    /* tiny footer */
+    footer.footer {
+      padding:18px 28px; text-align:center; font-size:13px; color:var(--muted);
+      border-top:1px dashed rgba(0,0,0,0.04);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- header (small) -->
+  <header class="header" role="banner" aria-label="EventGo header">
+    <div class="header-inner">
+      <div class="pill">Event<span>Go</span></div>
+      <nav aria-label="Breadcrumb">
+        <a href="/" style="text-decoration:none;color:var(--muted);font-weight:600">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="main">
+    <div class="grid" role="main">
+
+      <!-- left: booking form -->
+      <section class="card" aria-labelledby="pageTitle">
+        <div class="hero-banner" role="img" aria-hidden="true">
+          <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--purple),#9E5CFF);display:grid;place-items:center;color:#fff;font-weight:800">EG</div>
+          <div>
+            <div style="font-weight:700;color:#2b2160">Secure booking</div>
+            <div class="muted" style="font-size:13px">Fill your details & proceed to secure payment</div>
+          </div>
+        </div>
+
+        <h1 id="pageTitle">Book Tickets</h1>
+        <div id="eventMeta" class="muted">Please provide your details for the booking.</div>
+
+        <form id="bookingForm" class="booking-form" novalidate>
+          <input type="hidden" id="eventId" name="eventId" value="">
+
+          <label for="eventTitle">Event</label>
+          <input id="eventTitle" name="eventTitle" type="text" readonly aria-readonly="true" value="">
+
+          <label style="margin-top:12px">Choose ticket</label>
+          <div class="ticket-grid" role="radiogroup" aria-label="Ticket types">
+            <div class="ticket-type active" data-type="general" data-price="500" tabindex="0" role="radio" aria-checked="true">
+              <div style="font-weight:800">General</div>
+              <small>₹500 • Standard seating</small>
+            </div>
+            <div class="ticket-type" data-type="vip" data-price="1500" tabindex="0" role="radio" aria-checked="false">
+              <div style="font-weight:800">VIP</div>
+              <small>₹1500 • Front row + perks</small>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <div class="col">
+              <label for="quantity">Quantity</label>
+              <select id="quantity" name="quantity" aria-label="ticket quantity">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="promo">Promo code</label>
+              <input id="promo" name="promo" type="text" placeholder="e.g. SAVE10">
+            </div>
+          </div>
+
+          <label for="fullName">Full name</label>
+          <input id="fullName" name="fullName" type="text" placeholder="Your name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required>
+
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210" required>
+
+          <div class="error" id="formError" role="alert"></div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;">
+            <button type="submit" class="btn-primary" id="proceedBtn" aria-label="Proceed to Payment">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Proceed to Payment
+            </button>
+
+            <div class="muted-note">You will be redirected to a secure payment gateway. (Demo behaviour)</div>
+          </div>
+
+        </form>
+
+        <!-- decorative confetti -->
+        <div class="confetti" id="confetti" aria-hidden="true">
+          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <g>
+              <rect x="6" y="12" width="8" height="8" fill="#FFB46B" transform="rotate(12 10 16)"/>
+              <rect x="30" y="6" width="6" height="6" fill="#7C3AED" transform="rotate(-12 33 9)"/>
+              <rect x="80" y="22" width="6" height="6" fill="#34D399" transform="rotate(20 83 25)"/>
+              <rect x="56" y="8" width="8" height="8" fill="#FF7AA2" transform="rotate(-8 60 12)"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- right: order summary -->
+      <aside class="summary" aria-label="Order summary">
+        <div class="panel card">
+          <h3>Order summary</h3>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <div class="small">Tickets</div>
+            <div class="small" id="summaryTicket">General × 1</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div class="small">Subtotal</div>
+            <div class="price" id="summarySubtotal">—</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div class="small">Discount</div>
+            <div class="small" id="summaryDiscount">—</div>
+          </div>
+          <hr style="border:none;border-top:1px solid rgba(0,0,0,0.04);margin:12px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">Total</div>
+            <div class="price" id="summaryTotal">—</div>
+          </div>
+        </div>
+
+        <div class="panel card" style="text-align:center;">
+          <div style="font-weight:700;color:#3b2170">Secure Payments</div>
+          <div class="small" style="margin-top:8px">We accept UPI, cards & wallets</div>
+          <div style="margin-top:12px">
+            <div class="loader" aria-hidden="true"><div class="spinner" id="tinySpinner" style="display:none"></div></div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    © <strong>EventGo</strong> — crafted with care • <span style="color:var(--muted)">Secure checkout (demo)</span>
+  </footer>
+
+  <!-- Inline JS (booking logic + animations) -->
+  <script>
+    (function(){
+      // Read URL params
+      const params = new URLSearchParams(location.search);
+      const eventId = params.get('eventId') || '';
+      const titleParam = params.get('title') || '';
+
+      // Elements
+      const eventIdEl = document.getElementById('eventId');
+      const eventTitle = document.getElementById('eventTitle');
+      const eventMeta = document.getElementById('eventMeta');
+      const ticketTypes = Array.from(document.querySelectorAll('.ticket-type'));
+      const qtyEl = document.getElementById('quantity');
+      const promoEl = document.getElementById('promo');
+      const fullNameEl = document.getElementById('fullName');
+      const emailEl = document.getElementById('email');
+      const phoneEl = document.getElementById('phone');
+      const summaryTicket = document.getElementById('summaryTicket');
+      const summarySubtotal = document.getElementById('summarySubtotal');
+      const summaryDiscount = document.getElementById('summaryDiscount');
+      const summaryTotal = document.getElementById('summaryTotal');
+      const form = document.getElementById('bookingForm');
+      const formError = document.getElementById('formError');
+      const confetti = document.getElementById('confetti');
+      const spinner = document.getElementById('tinySpinner');
+      const proceedBtn = document.getElementById('proceedBtn');
+
+      // Prefill event details
+      if (eventId) eventIdEl.value = eventId;
+      if (titleParam) {
+        const title = decodeURIComponent(titleParam);
+        eventTitle.value = title;
+        document.getElementById('pageTitle').textContent = 'Book tickets — ' + title;
+        eventMeta.textContent = '';
+      } else {
+        eventTitle.value = 'Select event from homepage';
+      }
+
+      // ticket state
+      let selectedTicket = ticketTypes[0].dataset.type || 'general';
+
+      function setActiveTicket(el){
+        ticketTypes.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-checked','false');
+        });
+        el.classList.add('active');
+        el.setAttribute('aria-checked','true');
+        selectedTicket = el.dataset.type;
+        updateSummary();
+      }
+
+      ticketTypes.forEach(t => {
+        t.addEventListener('click', () => setActiveTicket(t));
+        t.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTicket(t); } });
+      });
+
+      // Calculate totals
+      function calc() {
+        const active = document.querySelector('.ticket-type.active');
+        const price = Number(active.dataset.price || 0);
+        const qty = Number(qtyEl.value || 1);
+        let subtotal = price * qty;
+        let discount = 0;
+        const promo = promoEl.value.trim().toUpperCase();
+        if (promo) {
+          // demo: SAVE10 gives 10% off, VIPFREE gives ₹200 off
+          if (promo === 'SAVE10') discount = Math.round(subtotal * 0.10);
+          else if (promo === 'VIPFREE' && active.dataset.type === 'vip') discount = 200;
+          else discount = 0;
+        }
+        const total = subtotal - discount;
+        return { price, qty, subtotal, discount, total };
+      }
+
+      function updateSummary() {
+        const data = calc();
+        const active = document.querySelector('.ticket-type.active');
+        summaryTicket.textContent = (active.dataset.type.charAt(0).toUpperCase() + active.dataset.type.slice(1)) + ' × ' + data.qty;
+        summarySubtotal.textContent = '₹' + data.subtotal;
+        summaryDiscount.textContent = data.discount ? '- ₹' + data.discount : '—';
+        summaryTotal.textContent = '₹' + data.total;
+      }
+
+      // listeners
+      qtyEl.addEventListener('change', updateSummary);
+      promoEl.addEventListener('input', () => { setTimeout(updateSummary, 150); });
+
+      updateSummary();
+
+      // Simple validation & mock submit
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        formError.style.display = 'none';
+
+        // basic client validation
+        if (!fullNameEl.value.trim() || !emailEl.value.trim() || !phoneEl.value.trim()) {
+          formError.textContent = 'Please fill name, email and phone.';
+          formError.style.display = 'block';
+          return;
+        }
+        // email pattern quick check
+        if (!/^\S+@\S+\.\S+$/.test(emailEl.value)) {
+          formError.textContent = 'Please enter a valid email address.';
+          formError.style.display = 'block';
+          emailEl.focus();
+          return;
+        }
+
+        // Lock UI & show spinner
+        proceedBtn.disabled = true;
+        spinner.style.display = 'block';
+        proceedBtn.style.opacity = '0.9';
+
+        // Simple "create order" payload
+        const active = document.querySelector('.ticket-type.active');
+        const d = calc();
+        const payload = {
+          eventId: eventIdEl.value || null,
+          eventTitle: eventTitle.value,
+          ticketType: active.dataset.type,
+          unitPrice: d.price,
+          quantity: d.qty,
+          discount: d.discount,
+          totalAmount: d.total,
+          customer: { name: fullNameEl.value.trim(), email: emailEl.value.trim(), phone: phoneEl.value.trim() },
+          promo: promoEl.value.trim() || null
+        };
+
+        try {
+          // Simulate network call to create order + payment session
+          await new Promise(res => setTimeout(res, 900));
+
+          // Demo: show confetti + success + mock redirect
+          confetti.classList.add('show');
+          // small pulse
+          setTimeout(() => confetti.classList.remove('show'), 1500);
+
+          // smooth "redirecting to payment" microflow
+          proceedBtn.textContent = 'Redirecting...';
+          // in real app: replace below with window.location = checkoutUrl returned from backend
+          await new Promise(res => setTimeout(res, 700));
+          // For demo, show an alert then go to a mock confirmation
+          alert('Mock order created!\\nOrder total: ₹' + d.total + '\\nYou would be redirected to payment provider now.');
+          // Redirect to a mock success page or your confirmation page
+          window.location.href = '/mock-payment-success.html';
+        } catch (err) {
+          console.error(err);
+          formError.textContent = 'Failed to create order. Please try again.';
+          formError.style.display = 'block';
+        } finally {
+          proceedBtn.disabled = false;
+          spinner.style.display = 'none';
+          proceedBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Proceed to Payment';
+        }
+      });
+
+      // accessibility: focus name input
+      fullNameEl.focus();
+
+      // small keyboard helper: allow switching tickets with left/right
+      document.addEventListener('keydown', (e) => {
+        if (['ArrowLeft','ArrowRight'].includes(e.key)) {
+          const idx = ticketTypes.findIndex(t => t.classList.contains('active'));
+          if (idx === -1) return;
+          let next = idx + (e.key === 'ArrowRight' ? 1 : -1);
+          if (next < 0) next = ticketTypes.length - 1;
+          if (next >= ticketTypes.length) next = 0;
+          setTimeout(() => ticketTypes[next].focus(), 0);
+          setActiveTicket(ticketTypes[next]);
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
