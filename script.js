@@ -170,3 +170,106 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+// filters.js
+document.addEventListener('DOMContentLoaded', () => {
+  const filtersPanel = document.querySelector('.filters-panel');
+  if (!filtersPanel) return;
+
+  const checkboxes = Array.from(filtersPanel.querySelectorAll('input[type="checkbox"][data-filter]'));
+  const eventCards = Array.from(document.querySelectorAll('.event-card'));
+
+  // utility: determine date buckets (today/tomorrow/weekend)
+  const isToday = (iso) => {
+    if (!iso) return false;
+    const d = new Date(iso);
+    const now = new Date();
+    return d.toDateString() === now.toDateString();
+  };
+  const isTomorrow = (iso) => {
+    if (!iso) return false;
+    const d = new Date(iso);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return d.toDateString() === tomorrow.toDateString();
+  };
+  const isWeekend = (iso) => {
+    if (!iso) return false;
+    const d = new Date(iso);
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  };
+
+  function gatherFilters() {
+    // returns object { category: [...], date: [...], price: [...], availability: [...] }
+    const result = {};
+    checkboxes.forEach(cb => {
+      if (!cb.checked) return;
+      const key = cb.getAttribute('data-filter');
+      result[key] = result[key] || [];
+      result[key].push(cb.value);
+    });
+    return result;
+  }
+
+  function matchPrice(cardValue, priceFilters) {
+    if (!priceFilters || priceFilters.length === 0) return true;
+    const p = Number(cardValue || 0);
+    return priceFilters.some(f => {
+      if (f === 'free') return p === 0;
+      if (f === '100-500') return p >= 100 && p <= 500;
+      if (f === '500-2000') return p >= 500 && p <= 2000;
+      if (f === '2000+') return p > 2000;
+      return false;
+    });
+  }
+
+  function matches(card, filters) {
+    // category
+    if (filters.category && filters.category.length) {
+      const cat = (card.dataset.category || '').trim();
+      if (!filters.category.includes(cat)) return false;
+    }
+
+    // date
+    if (filters.date && filters.date.length) {
+      const cardDate = card.dataset.date || '';
+      const dateMatches = filters.date.some(df => {
+        if (df === 'today') return isToday(cardDate);
+        if (df === 'tomorrow') return isTomorrow(cardDate);
+        if (df === 'weekend') return isWeekend(cardDate);
+        if (df === 'range') return true; // keep as true for now - implement datepicker later
+        return false;
+      });
+      if (!dateMatches) return false;
+    }
+
+    // price
+    if (!matchPrice(card.dataset.price, filters.price)) return false;
+
+    // availability
+    if (filters.availability && filters.availability.length) {
+      const avail = card.dataset.availability || '';
+      if (!filters.availability.includes(avail)) return false;
+    }
+
+    return true;
+  }
+
+  function applyFilters() {
+    const filters = gatherFilters();
+    eventCards.forEach(card => {
+      if (matches(card, filters)) {
+        card.style.display = '';
+        card.classList.remove('filtered-out');
+      } else {
+        card.style.display = 'none';
+        card.classList.add('filtered-out');
+      }
+    });
+  }
+
+  // attach change listeners
+  checkboxes.forEach(cb => cb.addEventListener('change', applyFilters));
+});
