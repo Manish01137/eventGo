@@ -131,4 +131,42 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   
   });
+
   
+  // mobile-header-behavior.js
+document.addEventListener('DOMContentLoaded', () => {
+  const menuToggle = document.getElementById('menu-toggle');
+  const topNav = document.querySelector('.top-nav');
+  // close menu when any nav link is clicked (so menu doesn't remain open)
+  topNav?.addEventListener('click', (e) => {
+    const target = e.target.closest && e.target.closest('a, button');
+    if (!target) return;
+    // if the clicked link is an anchor to external or booking page, close menu
+    if (menuToggle && menuToggle.checked) {
+      // small timeout to let the link activate before hiding (improves UX)
+      setTimeout(() => { menuToggle.checked = false; }, 120);
+    }
+  });
+
+  // create floating mobile CTA and append to body
+  const cta = document.createElement('a');
+  cta.className = 'mobile-book-cta';
+  cta.href = 'booking.html';
+  cta.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="filter:drop-shadow(0 6px 14px rgba(0,0,0,0.06))"><path d="M3 12h18M14 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Book Tickets</span>';
+  document.body.appendChild(cta);
+
+  // optional: hide floating CTA when keyboard is visible (mobile input focus)
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach(i => {
+    i.addEventListener('focus', () => { cta.style.opacity = '0'; cta.style.pointerEvents = 'none'; });
+    i.addEventListener('blur', () => { cta.style.opacity = '1'; cta.style.pointerEvents = 'auto'; });
+  });
+
+  // If menu opens, slightly push CTA up so it doesn't overlap menu
+  if (menuToggle) {
+    menuToggle.addEventListener('change', () => {
+      if (menuToggle.checked) cta.style.transform = 'translateY(-80px)';
+      else cta.style.transform = 'translateY(0)';
+    });
+  }
+});
